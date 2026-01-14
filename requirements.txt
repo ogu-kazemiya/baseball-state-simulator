@@ -1,0 +1,7 @@
+numpy
+pandas
+jupyterlab
+matplotlib
+seaborn
+tqdm
+pybaseball
