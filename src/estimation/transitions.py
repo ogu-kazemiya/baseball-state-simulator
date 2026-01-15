@@ -1,12 +1,12 @@
 import numpy as np
 import numpy.typing as npt
 import pandas as pd
-from ..common.constants import ALL_EVENTS
+import src.common.constants as consts
 
 def compute_count_matrix(df: pd.DataFrame, events: list[str] | None = None) -> npt.NDArray[np.int64]:
     if events is None:
-        events = ALL_EVENTS
-    if not set(events).issubset(set(ALL_EVENTS)):
+        events = consts.ALL_EVENTS
+    if not set(events).issubset(set(consts.ALL_EVENTS)):
         raise ValueError("Events list contains invalid event types.")
     
     df_filtered = df[df["events"].isin(events)]

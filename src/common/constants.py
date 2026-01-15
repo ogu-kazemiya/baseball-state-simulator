@@ -5,20 +5,20 @@ REQUIRED_COLS = [
     "game_date", "home_team", "away_team", "game_type", # 試合情報
     "game_pk", "inning", "inning_topbot", "at_bat_number", "pitch_number", # イニング・打席
     "outs_when_up", "balls", "strikes", "on_1b", "on_2b", "on_3b", # カウント・ランナー
-    "bat_score", "post_bat_score", "fld_score", # スコア
+    "bat_score", "post_bat_score", "fld_score", "post_home_score", "post_away_score", # スコア
     "events", "description", # 打撃結果
 ]
 
 # イベントの分類
 HIT_EVENTS = ["single", "double", "triple", "home_run"]
-NO_AB_ON_BASE_EVENTS = ["walk", "intent_walk", "hit_by_pitch"]
+NO_AB_ON_BASE_EVENTS = ["walk", "intent_walk", "hit_by_pitch", "catcher_interf"]
 AB_OUT_EVENT = [
     "strikeout", "strikeout_double_play",
     "field_out", "force_out", "fielders_choice_out", "grounded_into_double_play", "double_play", "triple_play",
     "field_error", "fielders_choice", "sac_bunt_double_play"
 ]
 SAC_OUT_EVENTS = ["sac_bunt", "sac_fly", "sac_fly_double_play"]
-EXCLUDE_EVENTS = ["catcher_interf", "truncated_pa", "ejection", "game_advisory"]
+EXCLUDE_EVENTS = ["truncated_pa", "ejection", "game_advisory"]
 AB_EVENTS = HIT_EVENTS + AB_OUT_EVENT
 PA_EVENTS = AB_EVENTS + NO_AB_ON_BASE_EVENTS + SAC_OUT_EVENTS
 ALL_EVENTS = PA_EVENTS + EXCLUDE_EVENTS
@@ -74,4 +74,4 @@ SCORE_MATRIX = np.array([
     [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1, 3, 2, 2, 2, 1, 1, 1, 0, 0],
     [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1, 4, 3, 3, 3, 2, 2, 2, 1, 0],
     [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-], dtype=int)
+], dtype=np.int64)
