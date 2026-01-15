@@ -63,7 +63,6 @@ def validate_states_transition(
     df: pd.DataFrame,
     mode: Literal["raise", "warn", "ignore", "drop", "return"] = "raise"
 ) -> pd.DataFrame:
-    print(consts.PA_EVENTS)
     estimated_scores_arr = consts.SCORE_MATRIX[df["state"].values, df["next_state"].values]
     estimated_scores = pd.Series(estimated_scores_arr, index=df.index).astype(int)
     estimated_scores = estimated_scores.where(df["events"].isin(consts.PA_EVENTS), estimated_scores - 1) # 打席が未完了

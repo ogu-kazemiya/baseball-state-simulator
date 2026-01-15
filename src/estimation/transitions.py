@@ -20,8 +20,8 @@ def compute_count_matrix(df: pd.DataFrame, events: list[str] | None = None) -> n
     count_matrix = counts.to_numpy(dtype=np.int64)
     return count_matrix
 
-def save_event_counts(df: pd.DataFrame) -> None:
-    count_matrices = {}
+def save_event_counts(df: pd.DataFrame) -> dict[str, npt.NDArray[np.int64]]:
+    count_matrices: dict[str, npt.NDArray[np.int64]] = {}
     for event in consts.ALL_EVENTS:
         matrix = compute_count_matrix(df, events=[event])
         count_matrices[event] = matrix
@@ -29,3 +29,5 @@ def save_event_counts(df: pd.DataFrame) -> None:
     os.makedirs(ARTIFACTS_DIR, exist_ok=True)
     out_path = ARTIFACTS_DIR / "event_count_matrices.npz"
     np.savez_compressed(out_path, **count_matrices)
+
+    return count_matrices
