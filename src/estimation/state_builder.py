@@ -2,6 +2,7 @@ from typing import Literal
 import warnings
 import pandas as pd
 import src.common.constants as consts
+import src.common.model_rules as model_rules
 
 def build_state_columns(df: pd.DataFrame) -> pd.DataFrame:
     return (
@@ -13,13 +14,14 @@ def build_state_columns(df: pd.DataFrame) -> pd.DataFrame:
     )
 
 def _add_state_column(df: pd.DataFrame) -> pd.DataFrame:
+    base_bit_map_inv: dict[int, int] = {v: k for k, v in consts.BASE_BIT_MAP}
     outs = df["outs_when_up"].astype(int)
     base_bits = (
         (df["on_1b"].notna().astype(int) * 1)
         + (df["on_2b"].notna().astype(int) * 2)
         + (df["on_3b"].notna().astype(int) * 4)
     )
-    base = base_bits.map(consts.BASE_BIT_MAP).astype(int)
+    base = base_bits.map(base_bit_map_inv).astype(int)
     state = outs * 8 + base
     df["state"] = state.astype(int)
     return df
@@ -62,7 +64,7 @@ def _validate_states_transition(
     df: pd.DataFrame,
     mode: Literal["raise", "warn", "ignore", "drop", "return"] = "raise"
 ) -> pd.DataFrame:
-    estimated_scores_arr = consts.SCORE_MATRIX[df["state"].values, df["next_state"].values]
+    estimated_scores_arr = model_rules.SCORE_MATRIX[df["state"].values, df["next_state"].values]
     estimated_scores = pd.Series(estimated_scores_arr, index=df.index).astype(int)
     estimated_scores = estimated_scores.where(df["events"].isin(consts.PA_EVENTS), estimated_scores - 1) # 打席が未完了
     actual_scores = (df["post_bat_score"] - df["bat_score"]).astype(int)
