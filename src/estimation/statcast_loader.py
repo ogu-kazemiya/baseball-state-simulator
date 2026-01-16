@@ -7,7 +7,6 @@ import pandas as pd
 from tqdm import tqdm
 from pybaseball import statcast, cache
 import src.common.constants as consts
-import src.estimation.utils as utils
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 STATCAST_DATA_DIR = PROJECT_ROOT / "data" / "statcast"
@@ -23,26 +22,26 @@ def get_statcast(
     years = range(start_year, end_year + 1)
 
     for year in years:
-        ensure_season_statcast(year)
+        _ensure_season_statcast(year)
 
     df_list = []
     for year in years:
-        df_year = get_season_statcast(year, columns)
+        df_year = _get_season_statcast(year, columns)
         df_list.append(df_year)
 
     return pd.concat(df_list, ignore_index=True)
 
-def get_season_statcast(year: int, columns: list[str]) -> pd.DataFrame:
+def _get_season_statcast(year: int, columns: list[str]) -> pd.DataFrame:
     file_path = STATCAST_DATA_DIR / f"statcast_{year}.parquet"
 
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"Statcast data for year {year} not found in cache.")
 
     df = pd.read_parquet(file_path, columns=columns)
-    utils.validate_columns(df, columns or [], context=f"get_season_statcast_({year}) cache")
+    _validate_columns(df, columns)
     return df
 
-def ensure_season_statcast(year: int) -> None:
+def _ensure_season_statcast(year: int) -> None:
     os.makedirs(STATCAST_DATA_DIR, exist_ok=True)
     file_path = STATCAST_DATA_DIR / f"statcast_{year}.parquet"
 
@@ -66,3 +65,10 @@ def ensure_season_statcast(year: int) -> None:
 
     df = pd.concat(df_list, ignore_index=True)
     df.to_parquet(file_path)
+
+def _validate_columns(df: pd.DataFrame, required_columns: list[str]) -> None:
+    required_columns = set(required_columns)
+    actual_columns = set(df.columns)
+    missing_columns = required_columns - actual_columns
+    if missing_columns:
+        raise ValueError(f"Missing columns: {', '.join(missing_columns)}")

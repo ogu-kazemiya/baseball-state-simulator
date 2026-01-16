@@ -2,18 +2,17 @@ from typing import Literal
 import warnings
 import pandas as pd
 import src.common.constants as consts
-import src.estimation.utils as utils
 
 def build_state_columns(df: pd.DataFrame) -> pd.DataFrame:
     return (
-        df.pipe(add_state_column)
-          .pipe(add_next_state_column)
-          .pipe(add_state_str_column)
-          .pipe(add_next_state_str_column)
-          .pipe(validate_states_transition, mode="drop")
+        df.pipe(_add_state_column)
+          .pipe(_add_next_state_column)
+          .pipe(_add_state_str_column)
+          .pipe(_add_next_state_str_column)
+          .pipe(_validate_states_transition, mode="drop")
     )
 
-def add_state_column(df: pd.DataFrame) -> pd.DataFrame:
+def _add_state_column(df: pd.DataFrame) -> pd.DataFrame:
     outs = df["outs_when_up"].astype(int)
     base_bits = (
         (df["on_1b"].notna().astype(int) * 1)
@@ -25,8 +24,8 @@ def add_state_column(df: pd.DataFrame) -> pd.DataFrame:
     df["state"] = state.astype(int)
     return df
 
-def add_next_state_column(df: pd.DataFrame) -> pd.DataFrame:
-    df = utils.sort_statcast_df(df)
+def _add_next_state_column(df: pd.DataFrame) -> pd.DataFrame:
+    df = _sort_statcast_df(df)
 
     next_game_pk = df["game_pk"].shift(-1)
     next_inning = df["inning"].shift(-1)
@@ -51,15 +50,15 @@ def add_next_state_column(df: pd.DataFrame) -> pd.DataFrame:
     df["next_state"] = next_state.fillna(-1).astype(int)
     return df
 
-def add_state_str_column(df: pd.DataFrame) -> pd.DataFrame:
+def _add_state_str_column(df: pd.DataFrame) -> pd.DataFrame:
     df["state_str"] = df["state"].map(consts.STATE_STR_MAP)
     return df
 
-def add_next_state_str_column(df: pd.DataFrame) -> pd.DataFrame:
+def _add_next_state_str_column(df: pd.DataFrame) -> pd.DataFrame:
     df["next_state_str"] = df["next_state"].map(consts.STATE_STR_MAP)
     return df
 
-def validate_states_transition(
+def _validate_states_transition(
     df: pd.DataFrame,
     mode: Literal["raise", "warn", "ignore", "drop", "return"] = "raise"
 ) -> pd.DataFrame:
@@ -88,3 +87,7 @@ def validate_states_transition(
     if mode == "return":
         df = df[is_invalid_transition].reset_index(drop=True)
     return df
+
+def _sort_statcast_df(df: pd.DataFrame) -> pd.DataFrame:
+    sort_cols = ["game_pk", "at_bat_number", "pitch_number"]
+    return df.sort_values(by=sort_cols).reset_index(drop=True)
