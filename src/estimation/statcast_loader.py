@@ -1,5 +1,6 @@
 import os
 import time
+import warnings
 from pathlib import Path
 from datetime import datetime, timedelta
 import pandas as pd
@@ -49,6 +50,7 @@ def ensure_season_statcast(year: int) -> None:
         return
 
     cache.enable()
+    warnings.filterwarnings("ignore", category=FutureWarning, module="pybaseball")
     months = range(3, 12)
     df_list = []
 
