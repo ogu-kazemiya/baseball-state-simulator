@@ -24,6 +24,18 @@ AB_EVENTS = HIT_EVENTS + AB_OUT_EVENT
 PA_EVENTS = AB_EVENTS + NO_AB_ON_BASE_EVENTS + SAC_OUT_EVENTS
 ALL_EVENTS = PA_EVENTS + EXCLUDE_EVENTS
 
+# 打席結果の分類マッピング
+RESULT_MAPPING = {
+    "single": ["single"],
+    "double": ["double"],
+    "triple": ["triple"],
+    "home_run": ["home_run"],
+    "walk": NO_AB_ON_BASE_EVENTS,
+    "strikeout": STRIKEOUT_EVENTS,
+    "field_out": FIELD_OUT_EVENTS,
+    "sac_out": SAC_OUT_EVENTS,
+}
+
 # 塁状況のバイナリ表現マッピング
 BASE_BIT_MAP = {
     0: 0b000, 1: 0b001, 2: 0b010, 3: 0b100,
