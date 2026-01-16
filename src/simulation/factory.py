@@ -13,8 +13,12 @@ def create_model(count_matrices: dict[str, npt.NDArray[np.int64]]) -> Model:
         for event in events:
             count_matrix += count_matrices[event]
 
-        count_matrix[24, :] = 0
-        count_matrix[24, 24] = 1
+        # 合計が0の行を対角成分1に置換
+        row_sums = count_matrix.sum(axis=1)
+        zero_rows = np.where(row_sums == 0)[0]
+        if len(zero_rows) > 0:
+            count_matrix[zero_rows, zero_rows] = 1
+
         prob_matrix = matrix_utils.normalize_transition_matrix(count_matrix.astype(np.float64))
         model[result] = prob_matrix
 

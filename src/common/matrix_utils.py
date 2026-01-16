@@ -1,5 +1,7 @@
 import numpy as np
 import numpy.typing as npt
+import pandas as pd
+import src.common.constants as consts
 
 def normalize_transition_matrix(matrix: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
     mat = matrix.copy()
@@ -14,3 +16,12 @@ def normalize_transition_matrix(matrix: npt.NDArray[np.float64]) -> npt.NDArray[
         )
 
     return mat / row_sums
+
+def print_matrix_formatted(matrix: npt.NDArray[np.float64], title: str = "Transition Matrix"):
+    labels = [consts.STATE_STR_MAP[i] for i in range(25)]
+    df = pd.DataFrame(matrix, index=labels, columns=labels)
+
+    print(f"\n=== {title} ===")
+    with pd.option_context('display.max_rows', 30, 'display.max_columns', 30, 'display.width', 1000):
+        display_df = df.round(3).map(lambda x: f"{x:.3f}".lstrip("0") if x > 0.0 else "")
+        print(display_df)
