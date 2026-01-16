@@ -23,4 +23,5 @@ print(f"DataFrame shape: {df.shape}")
 
 # %%
 # 4. 遷移回数行列の計算
-count_matrix = est.save_event_counts(df)
+count_matrices = est.compute_count_matrices(df)
+est.save_count_matrices(count_matrices)
