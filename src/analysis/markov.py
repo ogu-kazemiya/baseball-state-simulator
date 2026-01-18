@@ -1,5 +1,7 @@
 import numpy as np
+import pandas as pd
 from src.common.types import Matrix, Vector
+from src.common.constants import BASE_STR_MAP
 from src.common.model_rules import SCORE_MATRIX
 
 def solve_run_expectancy(lineup_matrices: list[Matrix]) -> list[Vector]:
@@ -44,3 +46,16 @@ def solve_run_expectancy(lineup_matrices: list[Matrix]) -> list[Vector]:
     # 各選手ごとに分割して返す
     run_expectancy_list: list[Vector] = np.split(run_expectancy, n) # 状態別期待値ベクトル(24)のリスト
     return run_expectancy_list
+
+def print_run_expectancies(run_expectancies: list[Vector]) -> None:
+    if any(re.shape != (24,) for re in run_expectancies):
+        raise ValueError("Each run expectancy vector must be of shape (24,)")
+    
+    outs_labels = ["0 Out", "1 Out", "2 Out"]
+    base_labels = [BASE_STR_MAP[i] for i in range(8)]
+
+    for i, re in enumerate(run_expectancies):
+        df = pd.DataFrame(re.reshape(3, 8), index=outs_labels, columns=base_labels)
+        print(f"=== Run Expectancy: Player {i + 1} at Bat ===")
+        print(df.round(3))
+        print()

@@ -97,3 +97,4 @@ def print_simulation_report(runs_array: npt.NDArray[np.int64]) -> None:
         bar = "#" * int(prob * 40) # 簡易グラフ
         print(f"  {score:2d} runs: {prob:6.1%} |{bar}")
     print("=========================")
+    print()
