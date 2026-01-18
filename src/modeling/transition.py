@@ -5,6 +5,7 @@ import numpy.typing as npt
 import pandas as pd
 import src.common.types as types
 import src.common.constants as consts
+import src.common.model_rules as model_rules
 import src.common.matrix_utils as matrix_utils
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
@@ -12,7 +13,7 @@ ARTIFACTS_DIR = PROJECT_ROOT / "data" / "artifacts"
 
 def compute_count_matrices(df: pd.DataFrame) -> dict[str, npt.NDArray[np.int64]]:
     count_matrices: dict[str, npt.NDArray[np.int64]] = {}
-    for event in consts.ALL_EVENTS:
+    for event in consts.PA_EVENTS:
         df_filtered = df[df["events"] == event]
         counts = pd.crosstab(df_filtered["state"], df_filtered["next_state"])
         counts = counts.reindex(index=range(25), columns=range(25), fill_value=0)
@@ -28,7 +29,7 @@ def save_count_matrices(count_matrices: dict[str, npt.NDArray[np.int64]]) -> Non
 def create_model(count_matrices: dict[str, npt.NDArray[np.int64]]) -> types.Model:
     model: types.Model = {}
 
-    for result, events in consts.RESULT_MAPPING.items():
+    for result, events in model_rules.RESULT_MAPPING.items():
         count_matrix = np.zeros((25, 25), dtype=np.int64)
         for event in events:
             count_matrix += count_matrices[event]

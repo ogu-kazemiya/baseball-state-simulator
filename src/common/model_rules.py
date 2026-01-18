@@ -2,6 +2,17 @@ import numpy as np
 import numpy.typing as npt
 import src.common.constants as consts
 
+# 打席結果の分類マッピング
+RESULT_MAPPING = {
+    "single": ["single"],
+    "double": ["double"],
+    "triple": ["triple"],
+    "home_run": ["home_run"],
+    "walk": consts.NO_AB_ON_BASE_EVENTS,
+    "strikeout": consts.STRIKEOUT_EVENTS,
+    "field_out": consts.FIELD_OUT_EVENTS,
+}
+
 def _create_score_matrix() -> npt.NDArray[np.int64]:
     score_matrix = np.zeros((25, 25), dtype=np.int64)
 
@@ -25,5 +36,4 @@ def _create_score_matrix() -> npt.NDArray[np.int64]:
 
             score_matrix[from_state, to_state] = score
     return score_matrix
-
 SCORE_MATRIX = _create_score_matrix()

@@ -15,26 +15,12 @@ NO_AB_ON_BASE_EVENTS = ["walk", "intent_walk", "hit_by_pitch", "catcher_interf"]
 STRIKEOUT_EVENTS = ["strikeout", "strikeout_double_play"]
 FIELD_OUT_EVENTS = [
     "field_out", "force_out", "fielders_choice_out", "grounded_into_double_play", "double_play", "triple_play",
-    "field_error", "fielders_choice", "sac_bunt_double_play"
+    "field_error", "fielders_choice", "sac_bunt_double_play", "sac_fly", "sac_fly_double_play"
 ]
-SAC_OUT_EVENTS = ["sac_bunt", "sac_fly", "sac_fly_double_play"]
+SAC_BUNT_EVENTS = ["sac_bunt"]
 EXCLUDE_EVENTS = ["truncated_pa", "ejection", "game_advisory"]
-AB_OUT_EVENT = STRIKEOUT_EVENTS + FIELD_OUT_EVENTS
-AB_EVENTS = HIT_EVENTS + AB_OUT_EVENT
-PA_EVENTS = AB_EVENTS + NO_AB_ON_BASE_EVENTS + SAC_OUT_EVENTS
+PA_EVENTS = HIT_EVENTS + NO_AB_ON_BASE_EVENTS + STRIKEOUT_EVENTS + FIELD_OUT_EVENTS + SAC_BUNT_EVENTS
 ALL_EVENTS = PA_EVENTS + EXCLUDE_EVENTS
-
-# 打席結果の分類マッピング
-RESULT_MAPPING = {
-    "single": ["single"],
-    "double": ["double"],
-    "triple": ["triple"],
-    "home_run": ["home_run"],
-    "walk": NO_AB_ON_BASE_EVENTS,
-    "strikeout": STRIKEOUT_EVENTS,
-    "field_out": FIELD_OUT_EVENTS,
-    "sac_out": SAC_OUT_EVENTS,
-}
 
 # 塁状況のバイナリ表現マッピング
 BASE_BIT_MAP = {
