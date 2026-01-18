@@ -1,20 +1,20 @@
 from typing import Literal
 import warnings
 import pandas as pd
-import src.common.constants as consts
-import src.common.model_rules as model_rules
+from src.common.constants import BASE_BIT_MAP, STATE_STR_MAP, PA_EVENTS
+from src.common.model_rules import SCORE_MATRIX
 
-def build_state_columns(df: pd.DataFrame) -> pd.DataFrame:
+def assign_state_features(df: pd.DataFrame) -> pd.DataFrame:
     return (
-        df.pipe(_add_state_column)
-          .pipe(_add_next_state_column)
-          .pipe(_add_state_str_column)
-          .pipe(_add_next_state_str_column)
-          .pipe(_validate_states_transition, mode="drop")
+        df.pipe(_assign_state)
+          .pipe(_assign_next_state)
+          .pipe(_assign_state_str)
+          .pipe(_assign_next_state_str)
+          .pipe(_validate_transition, mode="drop")
     )
 
-def _add_state_column(df: pd.DataFrame) -> pd.DataFrame:
-    base_bit_map_inv: dict[int, int] = {v: k for k, v in consts.BASE_BIT_MAP.items()}
+def _assign_state(df: pd.DataFrame) -> pd.DataFrame:
+    base_bit_map_inv: dict[int, int] = {v: k for k, v in BASE_BIT_MAP.items()}
     outs = df["outs_when_up"].astype(int)
     base_bits = (
         (df["on_1b"].notna().astype(int) * 1)
@@ -26,7 +26,7 @@ def _add_state_column(df: pd.DataFrame) -> pd.DataFrame:
     df["state"] = state.astype(int)
     return df
 
-def _add_next_state_column(df: pd.DataFrame) -> pd.DataFrame:
+def _assign_next_state(df: pd.DataFrame) -> pd.DataFrame:
     df = _sort_statcast_df(df)
 
     next_game_pk = df["game_pk"].shift(-1)
@@ -52,21 +52,21 @@ def _add_next_state_column(df: pd.DataFrame) -> pd.DataFrame:
     df["next_state"] = next_state.fillna(-1).astype(int)
     return df
 
-def _add_state_str_column(df: pd.DataFrame) -> pd.DataFrame:
-    df["state_str"] = df["state"].map(consts.STATE_STR_MAP)
+def _assign_state_str(df: pd.DataFrame) -> pd.DataFrame:
+    df["state_str"] = df["state"].map(STATE_STR_MAP)
     return df
 
-def _add_next_state_str_column(df: pd.DataFrame) -> pd.DataFrame:
-    df["next_state_str"] = df["next_state"].map(consts.STATE_STR_MAP)
+def _assign_next_state_str(df: pd.DataFrame) -> pd.DataFrame:
+    df["next_state_str"] = df["next_state"].map(STATE_STR_MAP)
     return df
 
-def _validate_states_transition(
+def _validate_transition(
     df: pd.DataFrame,
     mode: Literal["raise", "warn", "ignore", "drop", "return"] = "raise"
 ) -> pd.DataFrame:
-    estimated_scores_arr = model_rules.SCORE_MATRIX[df["state"].values, df["next_state"].values]
+    estimated_scores_arr = SCORE_MATRIX[df["state"].values, df["next_state"].values]
     estimated_scores = pd.Series(estimated_scores_arr, index=df.index).astype(int)
-    estimated_scores = estimated_scores.where(df["events"].isin(consts.PA_EVENTS), estimated_scores - 1) # 打席が未完了
+    estimated_scores = estimated_scores.where(df["events"].isin(PA_EVENTS), estimated_scores - 1)
     actual_scores = (df["post_bat_score"] - df["bat_score"]).astype(int)
 
     is_valid_transition = (

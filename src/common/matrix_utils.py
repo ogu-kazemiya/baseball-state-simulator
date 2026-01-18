@@ -1,10 +1,9 @@
 import numpy as np
-import numpy.typing as npt
 import pandas as pd
-import src.common.types as types
-import src.common.constants as consts
+from src.common.types import Matrix
+from src.common.constants import STATE_STR_MAP
 
-def normalize_transition_matrix(matrix: types.Matrix) -> types.Matrix:
+def normalize_transition_matrix(matrix: Matrix) -> Matrix:
     mat = matrix.copy()
 
     row_sums = mat.sum(axis=1, keepdims=True)
@@ -18,11 +17,11 @@ def normalize_transition_matrix(matrix: types.Matrix) -> types.Matrix:
 
     return mat / row_sums
 
-def print_matrix_formatted(matrix: types.Matrix, title: str = "Transition Matrix") -> None:
+def print_matrix_formatted(matrix: Matrix, title: str = "Transition Matrix") -> None:
     if matrix.shape != (25, 25):
         raise ValueError("Matrix must be of shape (25, 25) to print formatted.")
 
-    labels = [consts.STATE_STR_MAP[i] for i in range(25)]
+    labels = [STATE_STR_MAP[i] for i in range(25)]
     df = pd.DataFrame(matrix, index=labels, columns=labels)
 
     print(f"=== {title} ===")

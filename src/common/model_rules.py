@@ -1,6 +1,6 @@
 import numpy as np
 import numpy.typing as npt
-import src.common.constants as consts
+from src.common.constants import ON_BASE_EVENTS, STRIKEOUT_EVENTS, FIELD_OUT_EVENTS, BASE_BIT_MAP
 
 # 打席結果の分類マッピング
 RESULT_MAPPING = {
@@ -8,9 +8,9 @@ RESULT_MAPPING = {
     "double": ["double"],
     "triple": ["triple"],
     "home_run": ["home_run"],
-    "walk": consts.NO_AB_ON_BASE_EVENTS,
-    "strikeout": consts.STRIKEOUT_EVENTS,
-    "field_out": consts.FIELD_OUT_EVENTS,
+    "walk": ON_BASE_EVENTS,
+    "strikeout": STRIKEOUT_EVENTS,
+    "field_out": FIELD_OUT_EVENTS,
 }
 
 def _create_score_matrix() -> npt.NDArray[np.int64]:
@@ -19,15 +19,15 @@ def _create_score_matrix() -> npt.NDArray[np.int64]:
     for from_state in range(25):
         for to_state in range(25):
             from_outs =  from_state // 8
-            from_runners = consts.BASE_BIT_MAP[from_state % 8].bit_count()
+            from_runners = BASE_BIT_MAP[from_state % 8].bit_count()
             to_outs = to_state // 8
-            to_runners = consts.BASE_BIT_MAP[to_state % 8].bit_count()
+            to_runners = BASE_BIT_MAP[to_state % 8].bit_count()
 
             score = (from_outs + from_runners + 1) - (to_outs + to_runners)
             if from_outs > to_outs:
                 score = -1 # アウトは減らない
-            if (from_state % 8 == consts.BASE_BIT_MAP[0b100] and
-                to_state % 8 == consts.BASE_BIT_MAP[0b011]):
+            if (from_state % 8 == BASE_BIT_MAP[0b100] and
+                to_state % 8 == BASE_BIT_MAP[0b011]):
                 score = -1 # ランナーは戻らない
             if to_outs == 3:
                 score = min(score, 0) # 3アウト遷移は得点0とする

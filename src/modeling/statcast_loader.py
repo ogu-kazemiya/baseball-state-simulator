@@ -6,32 +6,32 @@ from datetime import datetime, timedelta
 import pandas as pd
 from tqdm import tqdm
 from pybaseball import statcast, cache
-import src.common.constants as consts
+from src.common.constants import REQUIRED_COLS
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 STATCAST_DATA_DIR = PROJECT_ROOT / "data" / "statcast"
 
-def get_statcast(
+def load_statcast(
     start_year: int,
     end_year: int | None = None,
     columns: list[str] | None = None,
 ) -> pd.DataFrame:
     if end_year is None:
         end_year = start_year
-    columns = list(dict.fromkeys(columns)) if columns is not None else consts.REQUIRED_COLS
+    columns = list(dict.fromkeys(columns)) if columns is not None else REQUIRED_COLS
     years = range(start_year, end_year + 1)
 
     for year in years:
-        _ensure_season_statcast(year)
+        _cache_season_statcast(year)
 
     df_list = []
     for year in years:
-        df_year = _get_season_statcast(year, columns)
+        df_year = _read_season_statcast(year, columns)
         df_list.append(df_year)
 
     return pd.concat(df_list, ignore_index=True)
 
-def _get_season_statcast(year: int, columns: list[str]) -> pd.DataFrame:
+def _read_season_statcast(year: int, columns: list[str]) -> pd.DataFrame:
     file_path = STATCAST_DATA_DIR / f"statcast_{year}.parquet"
 
     if not os.path.exists(file_path):
@@ -41,7 +41,7 @@ def _get_season_statcast(year: int, columns: list[str]) -> pd.DataFrame:
     _validate_columns(df, columns)
     return df
 
-def _ensure_season_statcast(year: int) -> None:
+def _cache_season_statcast(year: int) -> None:
     os.makedirs(STATCAST_DATA_DIR, exist_ok=True)
     file_path = STATCAST_DATA_DIR / f"statcast_{year}.parquet"
 

@@ -1,18 +1,16 @@
 import numpy as np
-import numpy.typing as npt
-import src.common.types as types
-import src.common.constants as consts
-import src.common.matrix_utils as matrix_utils
+from src.common.types import Model, Matrix
+from src.common.matrix_utils import normalize_transition_matrix
 
-def create_player_matrix(model: types.Model, player_probs: dict[str, float]) -> npt.NDArray[np.float64]:
-    if any(result not in player_probs for result in model.keys()):
+def build_player_matrix(transition_model: Model, player_probs: dict[str, float]) -> Matrix:
+    if any(result not in player_probs for result in transition_model.keys()):
         raise ValueError("Model does not contain all player result types.")
 
     player_matrix = np.zeros((25, 25), dtype=np.float64)
     for result, prob in player_probs.items():
-        if result not in model:
+        if result not in transition_model:
             continue
-        player_matrix += model[result] * prob
+        player_matrix += transition_model[result] * prob
 
-    player_matrix = matrix_utils.normalize_transition_matrix(player_matrix)
+    player_matrix = normalize_transition_matrix(player_matrix)
     return player_matrix
