@@ -5,8 +5,10 @@ import src.common.constants as consts
 import src.common.matrix_utils as matrix_utils
 
 def create_player_matrix(model: types.Model, player_probs: dict[str, float]) -> npt.NDArray[np.float64]:
-    player_matrix = np.zeros((25, 25), dtype=np.float64)
+    if any(result not in player_probs for result in model.keys()):
+        raise ValueError("Model does not contain all player result types.")
 
+    player_matrix = np.zeros((25, 25), dtype=np.float64)
     for result, prob in player_probs.items():
         if result not in model:
             continue
