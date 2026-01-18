@@ -14,7 +14,7 @@ def build_state_columns(df: pd.DataFrame) -> pd.DataFrame:
     )
 
 def _add_state_column(df: pd.DataFrame) -> pd.DataFrame:
-    base_bit_map_inv: dict[int, int] = {v: k for k, v in consts.BASE_BIT_MAP}
+    base_bit_map_inv: dict[int, int] = {v: k for k, v in consts.BASE_BIT_MAP.items()}
     outs = df["outs_when_up"].astype(int)
     base_bits = (
         (df["on_1b"].notna().astype(int) * 1)
@@ -75,6 +75,9 @@ def _validate_states_transition(
         | (df["next_state"] == -1) # サヨナラ
     )
     is_invalid_transition = ~is_valid_transition
+
+    df["estimated_score"] = estimated_scores
+    df["actual_score"] = actual_scores
 
     if mode == "raise":
         if is_invalid_transition.any():

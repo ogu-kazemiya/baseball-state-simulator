@@ -9,9 +9,9 @@ def _create_score_matrix() -> npt.NDArray[np.int64]:
         for to_state in range(25):
             from_outs =  from_state // 8
             from_runners = consts.BASE_BIT_MAP[from_state % 8].bit_count()
-            to_outs = from_state // 8
+            to_outs = to_state // 8
             to_runners = consts.BASE_BIT_MAP[to_state % 8].bit_count()
-            
+
             score = (from_outs + from_runners + 1) - (to_outs + to_runners)
             if from_outs > to_outs:
                 score = -1 # アウトは減らない
