@@ -12,8 +12,8 @@ def solve_run_expectancy(lineup_matrices: list[Matrix]) -> list[Vector]:
         raise ValueError("Each player matrix must be of shape (25, 25)")
 
     # 選手ごとに、一時的状態の遷移行列と報酬ベクトルを作成
-    q_list: list[Matrix] = [] # 一時的状態の遷移行列(24,24)のリスト
-    r_list: list[Vector] = [] # 報酬ベクトル(24)のリスト
+    q_list: list[Matrix] = []
+    r_list: list[Vector] = []
     for player_matrix in lineup_matrices:
         q_i = player_matrix[:24, :24]
         r_i = (q_i * SCORE_MATRIX[:24, :24]).sum(axis=1)
@@ -21,9 +21,8 @@ def solve_run_expectancy(lineup_matrices: list[Matrix]) -> list[Vector]:
         r_list.append(r_i)
 
     # 選手を並べて、統合した一時的状態の遷移行列と報酬ベクトルを作成
-    q_all: Matrix = np.zeros((24 * n, 24 * n)) # 統合した一時的状態の遷移行列(24n,24n)
-    r_all: Vector = np.zeros(24 * n) # 統合した報酬ベクトル(24n)
-
+    q_all: Matrix = np.zeros((24 * n, 24 * n))
+    r_all: Vector = np.zeros(24 * n)
     if n == 1:
         q_all = q_list[0]
     else:
@@ -41,16 +40,19 @@ def solve_run_expectancy(lineup_matrices: list[Matrix]) -> list[Vector]:
     # 吸収マルコフ連鎖の基本行列をを M = (I - Q)^(-1) とする
     # 求める期待値ベクトルは E = M R
     # つまり (I - Q) E = R を解く
-    run_expectancy = np.linalg.solve(np.eye(24 * n) - q_all, r_all) # 状態別期待値ベクトル(24n)
+    try:
+        run_expectancy = np.linalg.solve(np.eye(24 * n) - q_all, r_all)
+    except np.linalg.LinAlgError as e:
+        raise ValueError("Failed to solve for run expectancy due to singular matrix.") from e
 
     # 各選手ごとに分割して返す
-    run_expectancy_list: list[Vector] = np.split(run_expectancy, n) # 状態別期待値ベクトル(24)のリスト
+    run_expectancy_list: list[Vector] = np.split(run_expectancy, n)
     return run_expectancy_list
 
 def print_run_expectancies(run_expectancies: list[Vector]) -> None:
     if any(re.shape != (24,) for re in run_expectancies):
         raise ValueError("Each run expectancy vector must be of shape (24,)")
-    
+
     outs_labels = ["0 Out", "1 Out", "2 Out"]
     base_labels = [BASE_STR_MAP[i] for i in range(8)]
 

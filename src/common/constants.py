@@ -9,15 +9,15 @@ REQUIRED_COLS = [
 
 # イベントの分類
 HIT_EVENTS = ["single", "double", "triple", "home_run"]
-ON_BASE_EVENTS = ["walk", "intent_walk", "hit_by_pitch", "catcher_interf"]
+ON_BASE_EVENTS = ["walk", "hit_by_pitch"]
 STRIKEOUT_EVENTS = ["strikeout", "strikeout_double_play"]
 FIELD_OUT_EVENTS = [
     "field_out", "force_out", "fielders_choice_out", "grounded_into_double_play", "double_play", "triple_play",
     "field_error", "fielders_choice", "sac_bunt_double_play", "sac_fly", "sac_fly_double_play"
 ]
-SAC_BUNT_EVENTS = ["sac_bunt"]
-EXCLUDE_EVENTS = ["truncated_pa", "ejection", "game_advisory"]
-PA_EVENTS = HIT_EVENTS + ON_BASE_EVENTS + STRIKEOUT_EVENTS + FIELD_OUT_EVENTS + SAC_BUNT_EVENTS
+STRATEGY_EVENTS = ["sac_bunt", "sac_bunt_double_play", "intent_walk"]
+EXCLUDE_EVENTS = ["catcher_interf", "truncated_pa", "ejection", "game_advisory"]
+PA_EVENTS = HIT_EVENTS + ON_BASE_EVENTS + STRIKEOUT_EVENTS + FIELD_OUT_EVENTS + STRATEGY_EVENTS
 ALL_EVENTS = PA_EVENTS + EXCLUDE_EVENTS
 
 # 塁状況のバイナリ表現マッピング

@@ -1,6 +1,7 @@
 import numpy as np
 import numpy.typing as npt
 from src.common.types import Matrix
+from src.common.constants import STATE_STR_MAP
 from src.common.model_rules import SCORE_MATRIX
 
 def simulate_states(
@@ -71,16 +72,27 @@ def calculate_score_distribution(runs_array: npt.NDArray[np.int64]) -> dict[int,
     distribution = {int(k): v / total for k, v in zip(unique, counts)}
     return distribution
 
-def print_simulation_report(runs_array: npt.NDArray[np.int64]) -> None:
+def print_simulation_report(
+    runs_array: npt.NDArray[np.int64],
+    initial_batter: str | int | None = None,
+    initial_state: int | None = None,
+) -> None:
     if runs_array.size == 0:
         raise ValueError("runs_array must not be empty")
 
+    batter_str = str(initial_batter + 1) if type(initial_batter) is int else initial_batter
+    state_str = STATE_STR_MAP.get(initial_state)
     mean = np.mean(runs_array)
     std_dev = np.std(runs_array)
     dist = calculate_score_distribution(runs_array)
 
     print("=== Simulation Report ===")
+    if initial_batter is not None:
+        print(f" Batter: {batter_str}")
+    if initial_state is not None:
+        print(f" State : {state_str}")
     print(f" Trials: {len(runs_array):,}")
+    print("-" * 25)
     print(f" Mean  : {mean:.3f}")
     print(f" StdDev: {std_dev:.3f}")
     print("-" * 25)
