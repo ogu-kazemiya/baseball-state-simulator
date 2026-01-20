@@ -1,4 +1,5 @@
 data/statcast/*
+data/stats/*
 data/artifacts/*
 
 __pycache__/
