@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
-from src.common.types import Matrix
-from src.common.constants import STATE_STR_MAP
+from .types import Matrix
+from .constants import STATE_STR_MAP
 
 def normalize_transition_matrix(matrix: Matrix) -> Matrix:
     mat = matrix.copy()

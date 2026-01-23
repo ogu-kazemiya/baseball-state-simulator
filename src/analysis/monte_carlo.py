@@ -1,11 +1,9 @@
 import numpy as np
 import numpy.typing as npt
-from src.common.types import Matrix
-from src.common.constants import STATE_STR_MAP
-from src.common.model_rules import SCORE_MATRIX
+import src.common as cmn
 
 def simulate_states(
-    lineup_matrices: list[Matrix],
+    lineup_matrices: list[cmn.Matrix],
     batter_index: int = 0,
     state: str | int = 0,
     num_simulations: int = 100000,
@@ -16,7 +14,7 @@ def simulate_states(
     if any(p.shape != (25, 25) for p in lineup_matrices):
         raise ValueError("Each player matrix must be of shape (25, 25)")
     if isinstance(state, str):
-        state_str_map_inv = {v: k for k, v in STATE_STR_MAP.items()}
+        state_str_map_inv = {v: k for k, v in cmn.STATE_STR_MAP.items()}
         if state not in state_str_map_inv:
             raise ValueError(f"Invalid initial_state string: {state}")
         state = state_str_map_inv[state]
@@ -45,7 +43,7 @@ def simulate_states(
         next_states = np.minimum(next_states, 24) # 小数点誤差対策
 
         # 得点の更新
-        step_scores = SCORE_MATRIX[active_states, next_states]
+        step_scores = cmn.SCORE_MATRIX[active_states, next_states]
         total_runs[active_mask] += step_scores
 
         # 状態と打者の更新
@@ -85,13 +83,13 @@ def print_simulation_report(
     if runs_array.size == 0:
         raise ValueError("runs_array must not be empty")
     if isinstance(state, str):
-        state_str_map_inv = {v: k for k, v in STATE_STR_MAP.items()}
+        state_str_map_inv = {v: k for k, v in cmn.STATE_STR_MAP.items()}
         if state not in state_str_map_inv:
             raise ValueError(f"Invalid state string: {state}")
         state = state_str_map_inv[state]
 
     batter_str = str(batter + 1) if type(batter) is int else batter
-    state_str = STATE_STR_MAP.get(state)
+    state_str = cmn.STATE_STR_MAP.get(state)
     mean = np.mean(runs_array)
     std_dev = np.std(runs_array)
     dist = calculate_score_distribution(runs_array)

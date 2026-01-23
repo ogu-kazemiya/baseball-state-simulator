@@ -1,10 +1,8 @@
 import numpy as np
 import pandas as pd
-from src.common.types import Matrix, Vector
-from src.common.constants import BASE_STR_MAP
-from src.common.model_rules import SCORE_MATRIX
+import src.common as cmn
 
-def solve_run_expectancies(lineup_matrices: list[Matrix]) -> list[Vector]:
+def solve_run_expectancies(lineup_matrices: list[cmn.Matrix]) -> list[cmn.Vector]:
     n = len(lineup_matrices)
     if n == 0:
         raise ValueError("lineup_matrices must not be empty")
@@ -12,17 +10,17 @@ def solve_run_expectancies(lineup_matrices: list[Matrix]) -> list[Vector]:
         raise ValueError("Each player matrix must be of shape (25, 25)")
 
     # 選手ごとに、一時的状態の遷移行列と報酬ベクトルを作成
-    q_list: list[Matrix] = []
-    r_list: list[Vector] = []
+    q_list: list[cmn.Matrix] = []
+    r_list: list[cmn.Vector] = []
     for player_matrix in lineup_matrices:
         q_i = player_matrix[:24, :24]
-        r_i = (q_i * SCORE_MATRIX[:24, :24]).sum(axis=1)
+        r_i = (q_i * cmn.SCORE_MATRIX[:24, :24]).sum(axis=1)
         q_list.append(q_i)
         r_list.append(r_i)
 
     # 選手を並べて、統合した一時的状態の遷移行列と報酬ベクトルを作成
-    q_all: Matrix = np.zeros((24 * n, 24 * n))
-    r_all: Vector = np.zeros(24 * n)
+    q_all: cmn.Matrix = np.zeros((24 * n, 24 * n))
+    r_all: cmn.Vector = np.zeros(24 * n)
     if n == 1:
         q_all = q_list[0]
     else:
@@ -46,18 +44,18 @@ def solve_run_expectancies(lineup_matrices: list[Matrix]) -> list[Vector]:
         raise ValueError("Failed to solve for run expectancy due to singular matrix.") from e
 
     # 各選手ごとに分割して返す
-    run_expectancy_list: list[Vector] = np.split(run_expectancy, n)
+    run_expectancy_list: list[cmn.Vector] = np.split(run_expectancy, n)
     return run_expectancy_list
 
 def print_run_expectancies(
-    run_expectancies: list[Vector],
+    run_expectancies: list[cmn.Vector],
     player_names: list[str] | None = None
 ) -> None:
     if any(re.shape != (24,) for re in run_expectancies):
         raise ValueError("Each run expectancy vector must be of shape (24,)")
 
     outs_labels = ["0 Out", "1 Out", "2 Out"]
-    base_labels = [BASE_STR_MAP[i] for i in range(8)]
+    base_labels = [cmn.BASE_STR_MAP[i] for i in range(8)]
 
     print("=== Run Expectancies ===")
     for i, re in enumerate(run_expectancies):

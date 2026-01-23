@@ -1,6 +1,6 @@
 import numpy as np
 import numpy.typing as npt
-from src.common.constants import ON_BASE_EVENTS, STRIKEOUT_EVENTS, FIELD_OUT_EVENTS, BASE_BIT_MAP
+from .constants import ON_BASE_EVENTS, STRIKEOUT_EVENTS, FIELD_OUT_EVENTS, BASE_BIT_MAP
 
 # 打席結果の分類マッピング
 RESULT_MAPPING = {

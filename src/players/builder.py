@@ -1,8 +1,7 @@
 import numpy as np
 import pandas as pd
-from src.common.types import Model, Matrix
-from src.common.matrix_utils import normalize_transition_matrix
-from src.players.stats_utils import validate_and_fill_stats
+import src.common as cmn
+from .stats_utils import validate_and_fill_stats
 
 def convert_stats_to_probs(lineup_stats: pd.DataFrame) -> pd.DataFrame:
     stats = validate_and_fill_stats(lineup_stats)
@@ -41,7 +40,7 @@ def convert_stats_to_probs(lineup_stats: pd.DataFrame) -> pd.DataFrame:
 
     return probs
 
-def build_lineup_matrices(transition_model: Model, lineup_probs: pd.DataFrame) -> list[Matrix]:
+def build_lineup_matrices(transition_model: cmn.Model, lineup_probs: pd.DataFrame) -> list[cmn.Matrix]:
     model_results = set(transition_model.keys())
     probs_results = set(lineup_probs.columns)
     missing_results = model_results - probs_results
@@ -55,7 +54,7 @@ def build_lineup_matrices(transition_model: Model, lineup_probs: pd.DataFrame) -
             prob = row[result]
             player_matrix += transition_matrix * prob
         try:
-            player_matrix = normalize_transition_matrix(player_matrix)
+            player_matrix = cmn.normalize_transition_matrix(player_matrix)
         except Exception as e:
             player_name = row.get("Name", f"Batter {idx}")
             raise ValueError(f"Error normalizing player matrix for {player_name}") from e
