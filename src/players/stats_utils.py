@@ -20,7 +20,7 @@ def pick_lineup(stats_df: pd.DataFrame, batting_order: list[int | str]) -> pd.Da
             else:
                 missing_items.append(f"Index {selector} (out of bounds)")
         elif isinstance(selector, str):
-            matched = pool[pool["Name"] == selector]
+            matched = pool[pool["Name"].str.contains(selector, na=False)] # 部分一致検索
             if len(matched) == 1:
                 picked_rows.append(matched.iloc[0])
             elif len(matched) == 0:

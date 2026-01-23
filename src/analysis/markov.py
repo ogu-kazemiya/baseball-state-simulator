@@ -4,7 +4,7 @@ from src.common.types import Matrix, Vector
 from src.common.constants import BASE_STR_MAP
 from src.common.model_rules import SCORE_MATRIX
 
-def solve_run_expectancy(lineup_matrices: list[Matrix]) -> list[Vector]:
+def solve_run_expectancies(lineup_matrices: list[Matrix]) -> list[Vector]:
     n = len(lineup_matrices)
     if n == 0:
         raise ValueError("lineup_matrices must not be empty")
@@ -49,15 +49,20 @@ def solve_run_expectancy(lineup_matrices: list[Matrix]) -> list[Vector]:
     run_expectancy_list: list[Vector] = np.split(run_expectancy, n)
     return run_expectancy_list
 
-def print_run_expectancies(run_expectancies: list[Vector]) -> None:
+def print_run_expectancies(
+    run_expectancies: list[Vector],
+    player_names: list[str] | None = None
+) -> None:
     if any(re.shape != (24,) for re in run_expectancies):
         raise ValueError("Each run expectancy vector must be of shape (24,)")
 
     outs_labels = ["0 Out", "1 Out", "2 Out"]
     base_labels = [BASE_STR_MAP[i] for i in range(8)]
 
+    print("=== Run Expectancies ===")
     for i, re in enumerate(run_expectancies):
         df = pd.DataFrame(re.reshape(3, 8), index=outs_labels, columns=base_labels)
-        print(f"=== Run Expectancy: Player {i + 1} at Bat ===")
+        player_label = f"{i + 1}. {player_names[i]}" if player_names is not None else f"Player {i + 1}"
+        print(f"{player_label} at Bat")
         print(df.round(3))
         print()
