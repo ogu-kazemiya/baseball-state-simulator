@@ -1,3 +1,4 @@
+from typing import Literal
 import numpy as np
 import pandas as pd
 from .types import Matrix
@@ -17,7 +18,11 @@ def normalize_transition_matrix(matrix: Matrix) -> Matrix:
 
     return mat / row_sums
 
-def print_matrix_formatted(matrix: Matrix, title: str = "Transition Matrix") -> None:
+def print_matrix_formatted(
+    matrix: Matrix,
+    title: str = "Transition Matrix",
+    mode: Literal["count", "rate"] = "rate",
+) -> None:
     if matrix.shape != (25, 25):
         raise ValueError("Matrix must be of shape (25, 25) to print formatted.")
 
@@ -26,5 +31,19 @@ def print_matrix_formatted(matrix: Matrix, title: str = "Transition Matrix") -> 
 
     print(f"=== {title} ===")
     with pd.option_context('display.max_rows', 30, 'display.max_columns', 30, 'display.width', 1000):
-        display_df = df.round(3).map(lambda x: f"{x:.3f}".lstrip("0") if x > 0.0 else "")
+        if mode == "count":
+            display_df = df.astype(int).replace(0, "")
+        elif mode == "rate":
+            display_df = df.map(_format_rate)
+        else:
+            raise ValueError(f"Invalid mode: {mode} (must be 'count' or 'rate')")
         print(display_df)
+
+def _format_rate(val: float) -> str:
+    if val == 0 or pd.isna(val):
+        return ""
+
+    s = f"{val:.3f}"
+    if s.startswith("0"):
+        s = s[1:]
+    return s
