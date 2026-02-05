@@ -66,13 +66,14 @@ def calculate_prob_at_least(runs_array: npt.NDArray[np.int64], target_score: int
     prob = np.mean(runs_array >= target_score)
     return prob
 
-def calculate_score_distribution(runs_array: npt.NDArray[np.int64]) -> dict[int, float]:
+def calculate_score_distribution(runs_array: npt.NDArray[np.int64]) -> npt.NDArray[np.float64]:
     if runs_array.size == 0:
         raise ValueError("runs_array must not be empty")
 
     unique, counts = np.unique(runs_array, return_counts=True)
     total = runs_array.size
-    distribution = {int(k): v / total for k, v in zip(unique, counts)}
+    distribution = np.zeros(unique[-1] + 1, dtype=np.float64)
+    distribution[unique] = counts / total
     return distribution
 
 def print_simulation_report(
@@ -111,7 +112,7 @@ def print_simulation_report(
     print(f"  Score >= 4: {calculate_prob_at_least(runs_array, 4):.1%}")
     print("-" * 25)
     print(" [Distribution]")
-    for score in sorted(dist.keys()):
+    for score in range(len(dist)):
         prob = dist[score]
         if prob < 0.001: continue # 0.1%未満は省略
         bar = "#" * int(prob * 40) # 簡易グラフ
