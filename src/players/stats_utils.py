@@ -63,7 +63,8 @@ def get_formatted_stats(stats_df: pd.DataFrame, display_stats: list[str] | None 
         display_stats = ["AVG", "SLG", "OBP", "OPS", "AB", "H", "HR", "BB", "SO"]
 
     # 指標の計算
-    df["AB"] = df["PA"] - df["BB"] - df["HBP"] - df["SH"] - df["SF"]
+    if "AB" not in df.columns:
+        df["AB"] = df["PA"] - df["BB"] - df["HBP"] - df["SH"] - df["SF"]
     df["1B"] = df["H"] - df["2B"] - df["3B"] - df["HR"]
     df["AVG"] = df["H"] / df["AB"].replace(0, np.nan)
     df["SLG"] = (df["1B"] + 2 * df["2B"] + 3 * df["3B"] + 4 * df["HR"]) / df["AB"].replace(0, np.nan)

@@ -1,5 +1,5 @@
-import pandas as pd
 from pathlib import Path
+import pandas as pd
 
 # カラム名の表記ゆれを吸収するマッピング辞書
 COLUMN_MAPPING = {
@@ -19,7 +19,7 @@ COLUMN_MAPPING = {
     "sf": "SF",
 }
 
-def load_player_stats_from_csv(file_path: str | Path) -> pd.DataFrame:
+def load_stats_csv(file_path: str | Path) -> pd.DataFrame:
     path = Path(file_path)
     if not path.exists():
         raise FileNotFoundError(f"CSV file not found: {path}")
